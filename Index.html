@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Physics of Geometry Dash</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #212529;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      color: #007acc;
+      font-size: 1.8em;
+      margin-top: 20px;
+    }
+
+    h3 {
+      color: #005999;
+      margin-top: 16px;
+      font-size: 1.4em;
+    }
+
+    code, pre {
+      background-color: #e9ecef;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+
+    pre {
+      padding: 10px;
+      overflow-x: auto;
+    }
+
+    ul {
+      margin-left: 20px;
+    }
+
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>The Physics of Geometry Dash</h1>
+  <p><em>A Comprehensive Analysis</em></p>
+</header>
+
+<section>
+  <h2>Introduction</h2>
+  <p>Geometry Dash is a rhythm-based platform game with simple, yet precise physics governing the player character's movement. The mechanics are deterministic and frame-based, relying on constant forces and velocities to create predictable gameplay. This document aims to provide a deep, scientific understanding of the physical principles behind Geometry Dash’s mechanics, including gravity, collisions, momentum, jumping, and special modifiers like portals.</p>
+</section>
+
+<section>
+  <h2>1. Kinematic Foundations</h2>
+  <p>The player's position is defined in a 2D coordinate system, with the positive X-axis pointing right, and positive Y-axis pointing downward (standard screen coordinates).</p>
+
+  <h3>1.1 Velocity and Acceleration</h3>
+  <ul>
+    <li>Horizontal velocity <code>v<sub>x</sub></code> is generally constant during normal gameplay.</li>
+    <li>Vertical velocity <code>v<sub>y</sub></code> changes frame by frame due to gravity.</li>
+    <li>Gravity is a constant acceleration <code>g</code> applied every physics update (frame).</li>
+  </ul>
+
+  <h3>1.2 Update Equations</h3>
+  <pre>
+v_y(t + Δt) = v_y(t) + g · Δt
+x(t + Δt) = x(t) + v_x · Δt
+y(t + Δt) = y(t) + v_y(t + Δt) · Δt
+  </pre>
+  <ul>
+    <li><code>g</code> is gravity (~0.5 pixels/frame²).</li>
+    <li><code>v<sub>x</sub></code> is fixed (e.g., 4 pixels/frame).</li>
+    <li><code>Δt</code> is the frame duration (1/60 second).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>2. Gravity and Jump Dynamics</h2>
+  <p>Gravity imparts a continuous downward force increasing the vertical velocity each frame, simulating acceleration.</p>
+
+  <h3>2.1 Jump Initiation</h3>
+  <pre>
+v_y = v_jump ≈ -10 pixels/frame
+  </pre>
+  <p>The negative sign reflects upward movement against gravity.</p>
+
+  <h3>2.2 Jump Arc</h3>
+  <pre>
+y(t) = y₀ + v_jump · t + ½ · g · t²
+t_apex = -v_jump / g
+  </pre>
+  <p>The apex of the jump occurs when <code>v<sub>y</sub>(t) = 0</code>, and then the player starts to fall again.</p>
+</section>
+
+<section>
+  <h2>3. Collision Detection and Response</h2>
+
+  <h3>3.1 Bounding Boxes</h3>
+  <p>Uses AABB (Axis-Aligned Bounding Boxes):</p>
+  <pre>
+If: x_p &lt; x_e + w_e AND
+    x_p + w_p &gt; x_e AND
+    y_p &lt; y_e + h_e AND
+    y_p + h_p &gt; y_e
+Then: collision
+  </pre>
+
+  <h3>3.2 Collision Response</h3>
+  <ul>
+    <li>On ground collision, <code>v<sub>y</sub></code> is reset to 0.</li>
+    <li>Player position corrected to sit on top of the platform.</li>
+    <li>Collisions with hazards/spikes = instant death.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4. Horizontal Movement and Speed</h2>
+  <ul>
+    <li>Player moves automatically rightward at constant <code>v<sub>x</sub></code>.</li>
+    <li>No horizontal acceleration/deceleration.</li>
+    <li>Speed portals change <code>v<sub>x</sub></code> instantly.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>5. Portals and Physics Modifiers</h2>
+
+  <h3>5.1 Gravity Flip Portals</h3>
+  <pre>
+g → -g
+v_jump → -v_jump
+  </pre>
+
+  <h3>5.2 Speed Portals</h3>
+  <pre>
+v_x → v_x × S
+  </pre>
+
+  <h3>5.3 Jump Boost Portals</h3>
+  <pre>
+v_jump → v_jump × J
+  </pre>
+</section>
+
+<section>
+  <h2>6. Frame Rate and Numerical Stability</h2>
+  <ul>
+    <li>Frame-based physics at 60 FPS.</li>
+    <li>Fixed timestep integration = stable results.</li>
+    <li>Uses discrete Euler integration.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>7. Special Modes</h2>
+  <ul>
+    <li><strong>UFO</strong>: Inverts gravity briefly on jump = bounce effect.</li>
+    <li><strong>Wave</strong>: Moves diagonally, bounces floor to ceiling.</li>
+    <li><strong>Ball</strong>: Similar to default, with roll visuals and altered gravity.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>8. Additional Mechanics</h2>
+
+  <h3>8.1 Multi-Jumps</h3>
+  <p>Some levels allow multiple jumps without touching the ground.</p>
+
+  <h3>8.2 Spike Interaction</h3>
+  <p>Spike collisions = instant death. Hitboxes are tight and unforgiving.</p>
+
+  <h3>8.3 Delayed Portals</h3>
+  <p>Some portals delay their effects, adding timing complexity.</p>
+</section>
+
+<section>
+  <h2>Conclusion</h2>
+  <p>Geometry Dash’s physics, while seemingly simple, are precisely tuned for a smooth and challenging gameplay experience. The interplay of constant horizontal movement, gravity, jumping mechanics, and collision detection creates the core platforming challenge. Understanding these principles can aid players in mastering levels and help developers in creating balanced game content.</p>
+</section>
+
+<footer>
+  &copy; 2025 The Physics of Geometry Dash – Educational Reference
+</footer>
+
+</body>
+</html>
